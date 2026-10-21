@@ -27,6 +27,7 @@ manifest = f'''<?xml version="1.0" encoding="utf-8"?>
       <Property Id="Microsoft.VisualStudio.Code.ExecutesCode" Value="true"/>
     </Properties>
     <License>extension/LICENSE</License>
+    <Icon>extension/{package['icon']}</Icon>
   </Metadata>
   <Installation><InstallationTarget Id="Microsoft.VisualStudio.Code"/></Installation>
   <Dependencies/>
@@ -34,6 +35,7 @@ manifest = f'''<?xml version="1.0" encoding="utf-8"?>
     <Asset Type="Microsoft.VisualStudio.Code.Manifest" Path="extension/package.json" Addressable="true"/>
     <Asset Type="Microsoft.VisualStudio.Services.Content.Details" Path="extension/README.md" Addressable="true"/>
     <Asset Type="Microsoft.VisualStudio.Services.Content.License" Path="extension/LICENSE" Addressable="true"/>
+    <Asset Type="Microsoft.VisualStudio.Services.Icons.Default" Path="extension/{package['icon']}" Addressable="true"/>
   </Assets>
 </PackageManifest>'''
 content_types = '''<?xml version="1.0" encoding="utf-8"?>
@@ -41,6 +43,7 @@ content_types = '''<?xml version="1.0" encoding="utf-8"?>
 <Default Extension="json" ContentType="application/json"/>
 <Default Extension="js" ContentType="application/javascript"/>
 <Default Extension="svg" ContentType="image/svg+xml"/>
+<Default Extension="png" ContentType="image/png"/>
 <Default Extension="md" ContentType="text/markdown"/>
 <Default Extension="py" ContentType="text/plain"/>
 <Default Extension="vsixmanifest" ContentType="text/xml"/>

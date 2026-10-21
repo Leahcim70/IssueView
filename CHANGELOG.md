@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- Add the IssueView logo for the Marketplace and extension list.
+
 ## 0.2.1
 
 - Sign in with the minimal `read:user` scope; request `repo` only for private repositories.
