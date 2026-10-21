@@ -8,7 +8,7 @@ Zeigt die GitHub-Issues des geöffneten Projekts direkt in der **sekundären Sei
 
 ## Installation
 
-1. Die Datei `issueview-0.2.0.vsix` aus dem Ordner `downloads/` dieses Repositorys herunterladen.
+1. Die Datei `issueview-0.2.1.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
 2. VS Code: Erweiterungen → `…` → **Aus VSIX installieren… / Install from VSIX…**.
 3. Einen vertrauenswürdigen lokalen Projektordner mit GitHub-Git-Remote öffnen.
 4. Rechts **IssueView → Bei GitHub anmelden** anklicken und die Anmeldung bestätigen.
@@ -18,7 +18,7 @@ Falls die rechte Seitenleiste ausgeblendet ist: **Ansicht → Darstellung → Se
 Alternativ zur Installation über das Menü:
 
 ```sh
-code --install-extension issueview-0.2.0.vsix
+code --install-extension issueview-0.2.1.vsix
 ```
 
 Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installation von IssueView deinstallieren, um doppelte Ansichten zu vermeiden.
@@ -37,20 +37,20 @@ Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installatio
 
 Verwendet den eingebauten GitHub-Anmeldedienst von VS Code. Tokens werden weder in Einstellungen geschrieben noch protokolliert. Anfragen gehen ausschließlich an `https://api.github.com`; Browser-Links ausschließlich an `https://github.com`.
 
-Private Repositories erfordern die OAuth-Berechtigung `repo`. Diese GitHub-Berechtigung ist technisch umfassender als reiner Lesezugriff; die Erweiterung selbst führt ausschließlich lesende API-Anfragen aus. Organisationen mit SSO können eine zusätzliche Freigabe benötigen. Abmelden bzw. Zugriff widerrufen ist über die VS-Code-Kontoverwaltung möglich.
+Die Anmeldung fordert nur die Berechtigung `read:user` an; das genügt für öffentliche Repositories. Private Repositories benötigen zusätzlich die OAuth-Berechtigung `repo`. IssueView fragt sie erst an, wenn ein Repository nicht gefunden wird, oder über **IssueView: Zugriff auf private Repositories erlauben**. Diese GitHub-Berechtigung ist technisch umfassender als reiner Lesezugriff; die Erweiterung selbst führt ausschließlich lesende API-Anfragen aus. Organisationen mit SSO können eine zusätzliche Freigabe benötigen. Abmelden bzw. Zugriff widerrufen ist über die VS-Code-Kontoverwaltung möglich.
 
 Unterstützt GitHub.com, einschließlich dort gehosteter privater Organisations-Repositories. GitLab, Azure DevOps, eigene GitHub-Enterprise-Server und reine virtuelle Browser-Workspaces sind in dieser Version nicht enthalten. Ein SSH-Hostalias anstelle von `github.com` wird nicht aufgelöst.
 
 ## Quellcode und Entwicklung
 
-Die VSIX ist ein ZIP-Archiv. Der vollständige Quellcode einschließlich Tests und Paketierung liegt darin im Ordner `extension/`. Zum Entwickeln in einen eigenen Ordner entpacken und diesen mit VS Code öffnen.
+Der vollständige Quellcode einschließlich Tests und Paketierung liegt in diesem Repository. Zum Entwickeln das Repository klonen und mit VS Code öffnen.
 
 ```sh
 npm test
 npm run package
 ```
 
-Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.2.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace.
+Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.2.1.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt.
 
 Technische Referenzen:
 - https://code.visualstudio.com/updates/v1_106 (Secondary Side Bar contribution)

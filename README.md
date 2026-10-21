@@ -19,7 +19,7 @@ GitHub issues for your current project, directly in Visual Studio Code's **secon
 
 Requires **VS Code 1.106+** on Windows, macOS or Linux.
 
-1. Download `issueview-0.2.0.vsix` from this repository's `downloads/` directory.
+1. Download `issueview-0.2.1.vsix` from the [latest release](https://github.com/Leahcim70/IssueView/releases/latest).
 2. In VS Code, open **Extensions → … → Install from VSIX…** and select it.
 3. Open a trusted project folder with a GitHub remote.
 4. In **IssueView**, select **Sign in to GitHub**.
@@ -27,7 +27,7 @@ Requires **VS Code 1.106+** on Windows, macOS or Linux.
 If the sidebar is hidden, enable **View → Appearance → Secondary Side Bar**, or use **View: Open View… → IssueView**. Placement follows your VS Code layout.
 
 ```sh
-code --install-extension downloads/issueview-0.2.0.vsix
+code --install-extension issueview-0.2.1.vsix
 ```
 
 The prototype used the extension name `project-issues-sidebar`. Uninstall it before installing IssueView to avoid duplicate views.
@@ -46,7 +46,7 @@ The toolbar provides **Refresh**, **Filter by status**, and **Select repository*
 
 IssueView uses VS Code's built-in GitHub authentication provider. Tokens are never written to settings or logs. API requests go only to `https://api.github.com`; issue links open only on `https://github.com`.
 
-Private repositories require GitHub's `repo` OAuth scope. This scope grants broader permissions, but IssueView only makes read requests. Organization SSO may require additional authorization. Manage sign-in and extension access through VS Code's account menu.
+Sign-in requests only the `read:user` scope, which is enough for public repositories. Private repositories additionally need GitHub's `repo` scope; IssueView asks for it only when a repository is not found, or via **IssueView: Grant access to private repositories**. That scope grants broader permissions, but IssueView only makes read requests. Organization SSO may require additional authorization. Manage sign-in and extension access through VS Code's account menu.
 
 GitLab, Azure DevOps, self-hosted GitHub Enterprise, virtual browser-only workspaces and custom SSH host aliases are not supported.
 
@@ -59,7 +59,7 @@ npm test
 npm run package
 ```
 
-Packaging writes `dist/issueview-0.2.0.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Copy the tested build into `downloads/` to update the downloadable package.
+Packaging writes `dist/issueview-0.2.1.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release.
 
 Tests cover repository detection, safe API targets, authentication headers, pagination, errors, cancellation, project switches during requests, both UI languages and translation completeness. The actual GitHub OAuth flow requires a manual check with an authorized account.
 

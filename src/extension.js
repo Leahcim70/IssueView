@@ -63,12 +63,15 @@ async function activate(context) {
     hasMore = false;
     view.description = repo ? `${repo.fullName} · ${filters[state]}` : undefined;
     message(vscode.l10n.t("Loading issues…"));
+    let session;
     try {
       if (!repo) {
         message(vscode.l10n.t("Open a project with a GitHub remote."));
         return;
       }
-      const session = await vscode.authentication.getSession('github', ['repo'], { silent: true });
+      // Read issues with a minimal token; only private repositories need the broad 'repo' scope.
+      session = await vscode.authentication.getSession('github', ['repo'], { silent: true }) ||
+        await vscode.authentication.getSession('github', ['read:user'], { silent: true });
       if (controller.signal.aborted) return;
       if (!session) {
         message(vscode.l10n.t("Sign in to GitHub"), 'projectIssues.signIn');
@@ -89,7 +92,9 @@ async function activate(context) {
       if (!rows.length) message(vscode.l10n.t("No issues for this status."));
       else changed.fire();
     } catch (error) {
-      if (!controller.signal.aborted) {
+      if (!controller.signal.aborted && error.status === 404 && !session?.scopes?.includes('repo')) {
+        message(vscode.l10n.t("Repository not found. Private repository? Grant access"), 'projectIssues.signInPrivate');
+      } else if (!controller.signal.aborted) {
         const explanation = error.name === 'TimeoutError' ? vscode.l10n.t("The request to GitHub timed out.") :
           error.message === 'fetch failed' ? vscode.l10n.t("Cannot reach GitHub. Check your network connection.") : error.message;
         message(vscode.l10n.t("{0} – Try again", explanation), 'projectIssues.refresh');
@@ -97,6 +102,13 @@ async function activate(context) {
     } finally {
       if (requestController === controller) busy = false;
     }
+  }
+
+  async function signIn(scopes) {
+    try {
+      await vscode.authentication.getSession('github', scopes, { createIfNone: true });
+      await refresh();
+    } catch { vscode.window.showErrorMessage(vscode.l10n.t("GitHub sign-in was cancelled or failed.")); }
   }
 
   function syncRepository() {
@@ -121,12 +133,8 @@ async function activate(context) {
     vscode.authentication.onDidChangeSessions(event => { if (event.provider.id === 'github') void refresh(); }),
     vscode.commands.registerCommand('projectIssues.refresh', () => refresh()),
     vscode.commands.registerCommand('projectIssues.loadMore', () => refresh(true)),
-    vscode.commands.registerCommand('projectIssues.signIn', async () => {
-      try {
-        await vscode.authentication.getSession('github', ['repo'], { createIfNone: true });
-        await refresh();
-      } catch { vscode.window.showErrorMessage(vscode.l10n.t("GitHub sign-in was cancelled or failed.")); }
-    }),
+    vscode.commands.registerCommand('projectIssues.signIn', () => signIn(['read:user'])),
+    vscode.commands.registerCommand('projectIssues.signInPrivate', () => signIn(['repo'])),
     vscode.commands.registerCommand('projectIssues.filter', async () => {
       const choice = await vscode.window.showQuickPick(Object.entries(filters).map(([value, label]) => ({ label, value })), { title: vscode.l10n.t("Which issues should be shown?") });
       if (choice) {

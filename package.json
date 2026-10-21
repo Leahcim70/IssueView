@@ -2,7 +2,7 @@
   "name": "issueview",
   "displayName": "IssueView",
   "description": "%extension.description%",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "michael-lantzen",
   "license": "MIT",
   "engines": {
@@ -58,6 +58,11 @@
         "icon": "$(account)"
       },
       {
+        "command": "projectIssues.signInPrivate",
+        "title": "%command.signInPrivate%",
+        "icon": "$(lock)"
+      },
+      {
         "command": "projectIssues.filter",
         "title": "%command.filter%",
         "icon": "$(filter)"
@@ -87,6 +92,10 @@
         },
         {
           "command": "projectIssues.signIn",
+          "when": "view == projectIssues.list"
+        },
+        {
+          "command": "projectIssues.signInPrivate",
           "when": "view == projectIssues.list"
         }
       ]

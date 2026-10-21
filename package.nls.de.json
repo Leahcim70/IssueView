@@ -4,5 +4,6 @@
   "command.refresh": "IssueView: Aktualisieren",
   "command.signIn": "IssueView: Bei GitHub anmelden",
   "command.filter": "IssueView: Status filtern",
-  "command.selectRepository": "IssueView: Repository auswählen"
+  "command.selectRepository": "IssueView: Repository auswählen",
+  "command.signInPrivate": "IssueView: Zugriff auf private Repositories erlauben"
 }

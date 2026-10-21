@@ -17,7 +17,8 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
   });
   const first = repository('first');
   const second = repository('second');
-  let activeRepository = first, session, provider, picker;
+  let activeRepository = first, provider, picker;
+  const sessions = {};
   const git = { repositories: [first, second], getRepository: () => activeRepository,
     onDidOpenRepository: subscribe('openRepo'), onDidCloseRepository: subscribe('closeRepo') };
   const vscode = {
@@ -41,9 +42,10 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     },
     authentication: {
       getSession: async (_provider, scopes, options) => {
-        assert.deepEqual(scopes, ['repo']);
-        if (options.createIfNone) session = { accessToken: 'test-token' };
-        return session;
+        const key = scopes.join();
+        assert.ok(['repo', 'read:user'].includes(key), key);
+        if (options.createIfNone) sessions[key] = { accessToken: `${key}-token`, scopes };
+        return sessions[key];
       }, onDidChangeSessions: subscribe('auth')
     },
     commands: { registerCommand: (name, callback) => { commands.set(name, callback); return { dispose() {} }; } }
@@ -87,6 +89,17 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     pending[2].resolve(new Response('[]'));
     await filtered;
     assert.equal(provider.getChildren()[0].label, t('No issues for this status.'));
+    assert.equal(pending[2].options.headers.Authorization, 'Bearer read:user-token');
+    const reload = commands.get('projectIssues.refresh')();
+    await flush();
+    pending[3].resolve(new Response('{}', { status: 404 }));
+    await reload;
+    assert.equal(provider.getChildren()[0].command.command, 'projectIssues.signInPrivate');
+    const grant = commands.get('projectIssues.signInPrivate')();
+    await flush();
+    assert.equal(pending[4].options.headers.Authorization, 'Bearer repo-token');
+    pending[4].resolve(new Response('[]'));
+    await grant;
     activeRepository = undefined;
     git.repositories = [];
     events.closeRepo(first); events.closeRepo(second);

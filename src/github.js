@@ -45,7 +45,7 @@ async function fetchIssues(repo, state, page, token, signal, request = fetch, t 
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
       'X-GitHub-Api-Version': '2026-03-10',
-      'User-Agent': 'project-issues-sidebar'
+      'User-Agent': 'IssueView'
     },
     redirect: 'error',
     signal: AbortSignal.any([signal, AbortSignal.timeout(20000)])
@@ -57,7 +57,7 @@ async function fetchIssues(repo, state, page, token, signal, request = fetch, t 
       404: t("Repository not found or access denied."),
       429: t("GitHub API rate limit reached. Please refresh later.")
     };
-    throw new Error(errors[response.status] || t("GitHub request failed (HTTP {0}).", response.status));
+    throw Object.assign(new Error(errors[response.status] || t("GitHub request failed (HTTP {0}).", response.status)), { status: response.status });
   }
   const data = await response.json();
   if (!Array.isArray(data)) throw new Error(t("Unexpected response from GitHub."));

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Sign in with the minimal `read:user` scope; request `repo` only for private repositories.
+- Add command to grant access to private repositories.
+- Send `IssueView` as User-Agent.
+- Distribute the VSIX through GitHub releases instead of the `downloads/` folder.
+
 ## 0.2.0
 
 - Rename the extension to IssueView.

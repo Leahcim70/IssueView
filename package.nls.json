@@ -4,5 +4,6 @@
   "command.refresh": "IssueView: Refresh",
   "command.signIn": "IssueView: Sign in to GitHub",
   "command.filter": "IssueView: Filter by status",
-  "command.selectRepository": "IssueView: Select repository"
+  "command.selectRepository": "IssueView: Select repository",
+  "command.signInPrivate": "IssueView: Grant access to private repositories"
 }

@@ -23,5 +23,6 @@
   "Unexpected response from GitHub.": "Unexpected response from GitHub.",
   "Labels: {0}": "Labels: {0}",
   "{0} – Try again": "{0} – Try again",
-  "GitHub request failed (HTTP {0}).": "GitHub request failed (HTTP {0})."
+  "GitHub request failed (HTTP {0}).": "GitHub request failed (HTTP {0}).",
+  "Repository not found. Private repository? Grant access": "Repository not found. Private repository? Grant access"
 }
