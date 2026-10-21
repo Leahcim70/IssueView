@@ -1,0 +1,8 @@
+{
+  "extension.description": "GitHub issues for the current project in the secondary sidebar.",
+  "view.title": "IssueView",
+  "command.refresh": "IssueView: Refresh",
+  "command.signIn": "IssueView: Sign in to GitHub",
+  "command.filter": "IssueView: Filter by status",
+  "command.selectRepository": "IssueView: Select repository"
+}

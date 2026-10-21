@@ -1,0 +1,8 @@
+{
+  "extension.description": "GitHub-Issues des aktuellen Projekts in der rechten Seitenleiste.",
+  "view.title": "IssueView",
+  "command.refresh": "IssueView: Aktualisieren",
+  "command.signIn": "IssueView: Bei GitHub anmelden",
+  "command.filter": "IssueView: Status filtern",
+  "command.selectRepository": "IssueView: Repository auswählen"
+}

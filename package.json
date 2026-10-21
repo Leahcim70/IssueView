@@ -1,0 +1,104 @@
+{
+  "name": "issueview",
+  "displayName": "IssueView",
+  "description": "%extension.description%",
+  "version": "0.2.0",
+  "publisher": "michael-lantzen",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.106.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./src/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "extensionDependencies": [
+    "vscode.git",
+    "vscode.github-authentication"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "package": "python3 scripts/package.py"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "secondarySidebar": [
+        {
+          "id": "projectIssues",
+          "title": "IssueView",
+          "icon": "media/issues.svg"
+        }
+      ]
+    },
+    "views": {
+      "projectIssues": [
+        {
+          "id": "projectIssues.list",
+          "name": "%view.title%"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "projectIssues.refresh",
+        "title": "%command.refresh%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "projectIssues.signIn",
+        "title": "%command.signIn%",
+        "icon": "$(account)"
+      },
+      {
+        "command": "projectIssues.filter",
+        "title": "%command.filter%",
+        "icon": "$(filter)"
+      },
+      {
+        "command": "projectIssues.selectRepository",
+        "title": "%command.selectRepository%",
+        "icon": "$(repo)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "projectIssues.selectRepository",
+          "when": "view == projectIssues.list",
+          "group": "navigation@1"
+        },
+        {
+          "command": "projectIssues.filter",
+          "when": "view == projectIssues.list",
+          "group": "navigation@2"
+        },
+        {
+          "command": "projectIssues.refresh",
+          "when": "view == projectIssues.list",
+          "group": "navigation@3"
+        },
+        {
+          "command": "projectIssues.signIn",
+          "when": "view == projectIssues.list"
+        }
+      ]
+    }
+  },
+  "l10n": "./l10n",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Leahcim70/IssueView.git"
+  },
+  "homepage": "https://github.com/Leahcim70/IssueView#readme",
+  "bugs": {
+    "url": "https://github.com/Leahcim70/IssueView/issues"
+  }
+}
