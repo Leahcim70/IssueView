@@ -1,0 +1,39 @@
+# Publishes the VSIX attached to a GitHub release to the VS Code Marketplace.
+# Authenticates via Microsoft Entra ID (OIDC); no PAT is stored.
+name: Publish to Marketplace
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (e.g. v0.3.0)
+        required: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Show Marketplace identity ID
+        run: az rest -u https://app.vssps.visualstudio.com/_apis/profile/profiles/me --resource 499b84ac-1321-427f-aa17-267ca6975798 --query id -o tsv
+
+      - name: Download release VSIX
+        run: gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern '*.vsix' --dir dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Publish
+        run: npx --yes @vscode/vsce@4.0.0 publish --azure-credential --skip-duplicate --packagePath dist/*.vsix

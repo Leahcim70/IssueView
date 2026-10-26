@@ -51,7 +51,7 @@ npm test
 npm run package
 ```
 
-Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.3.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt.
+Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.3.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt `.github/workflows/marketplace.yml` sie in den VS Code Marketplace.
 
 Technische Referenzen:
 - https://code.visualstudio.com/updates/v1_106 (Secondary Side Bar contribution)
