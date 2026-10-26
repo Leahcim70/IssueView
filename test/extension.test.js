@@ -25,7 +25,8 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     l10n: { t },
     extensions: { getExtension: () => ({ activate: async () => ({ getAPI: () => git }) }) },
     EventEmitter: class { event = () => {}; fire() {} dispose() {} },
-    TreeItem: class { constructor(label) { this.label = label; } },
+    TreeItem: class { constructor(label, collapsibleState) { this.label = label; this.collapsibleState = collapsibleState; } },
+    TreeItemCollapsibleState: { Expanded: 2 },
     ThemeIcon: class {}, ThemeColor: class {},
     MarkdownString: class { value = ''; appendText(value) { this.value += value; } },
     Uri: { parse: value => value },
@@ -82,9 +83,11 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     const item = provider.getChildren()[0];
     await commands.get(item.command.command)(...item.command.arguments);
     assert.deepEqual(opened, ['https://github.com/owner/second/issues/22']);
-    const [, separator, pull] = provider.getChildren();
-    assert.equal(separator.label, t('Pull requests'));
-    assert.equal(separator.command, undefined);
+    const [, group] = provider.getChildren();
+    assert.equal(group.label, t('Pull requests'));
+    assert.equal(group.command, undefined);
+    assert.equal(group.collapsibleState, vscode.TreeItemCollapsibleState.Expanded);
+    const [pull] = provider.getChildren(group);
     assert.equal(pull.label, '#7  Feature');
     await commands.get(pull.command.command)(...pull.command.arguments);
     assert.equal(opened.pop(), 'https://github.com/owner/second/pull/7');

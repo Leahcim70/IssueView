@@ -8,7 +8,7 @@ Zeigt die GitHub-Issues des geöffneten Projekts direkt in der **sekundären Sei
 
 ## Installation
 
-1. Die Datei `issueview-0.3.0.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
+1. Die Datei `issueview-0.3.1.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
 2. VS Code: Erweiterungen → `…` → **Aus VSIX installieren… / Install from VSIX…**.
 3. Einen vertrauenswürdigen lokalen Projektordner mit GitHub-Git-Remote öffnen.
 4. Rechts **IssueView → Bei GitHub anmelden** anklicken und die Anmeldung bestätigen.
@@ -18,7 +18,7 @@ Falls die rechte Seitenleiste ausgeblendet ist: **Ansicht → Darstellung → Se
 Alternativ zur Installation über das Menü:
 
 ```sh
-code --install-extension issueview-0.3.0.vsix
+code --install-extension issueview-0.3.1.vsix
 ```
 
 Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installation von IssueView deinstallieren, um doppelte Ansichten zu vermeiden.
@@ -32,7 +32,7 @@ Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installatio
 - **Repository auswählen** erlaubt bei mehreren Projekten eine feste Auswahl. Im automatischen Modus folgt die Ansicht dem Repository der aktiven Datei; ohne aktive Datei verwendet sie das erste erkannte Git-Repository.
 - Bevorzugt den Remote des aktuellen Upstream-Branches, danach `origin`, danach den ersten erkannten GitHub-Remote.
 - **Weitere Issues laden** lädt die nächste API-Seite. Pull Requests werden dabei ausgeblendet; eine Seite kann deshalb weniger als 100 Issues enthalten.
-- Unter den Issues folgen nach dem Trenner **Pull Requests** die offenen Pull Requests des Repositorys.
+- Unter den Issues folgen in der einklappbaren Gruppe **Pull Requests** die offenen Pull Requests des Repositorys.
 
 ## Anmeldung und Datenschutz
 
@@ -51,7 +51,7 @@ npm test
 npm run package
 ```
 
-Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.3.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
+Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.3.1.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
 
 Technische Referenzen:
 - https://code.visualstudio.com/updates/v1_106 (Secondary Side Bar contribution)

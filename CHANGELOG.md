@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Make the "Pull requests" group collapsible.
+
 ## 0.3.0
 
 - Show open pull requests below the issues, separated by a "Pull requests" heading.

@@ -14,7 +14,7 @@ async function activate(context) {
   const provider = {
     onDidChangeTreeData: changed.event,
     getTreeItem: item => item,
-    getChildren: () => rows
+    getChildren: item => item ? item.children : rows
   };
   const view = vscode.window.createTreeView('projectIssues.list', { treeDataProvider: provider, showCollapseAll: false });
   context.subscriptions.push(changed, view);
@@ -97,9 +97,11 @@ async function activate(context) {
       }
       if (!rows.length) rows.push(new vscode.TreeItem(vscode.l10n.t("No issues for this status.")));
       if (pulls.length) {
-        const separator = new vscode.TreeItem(vscode.l10n.t("Pull requests"));
-        separator.description = String(pulls.length);
-        rows.push(separator, ...pulls);
+        const group = new vscode.TreeItem(vscode.l10n.t("Pull requests"), vscode.TreeItemCollapsibleState.Expanded);
+        group.id = 'pullRequests';
+        group.description = String(pulls.length);
+        group.children = pulls;
+        rows.push(group);
       }
       changed.fire();
     } catch (error) {
