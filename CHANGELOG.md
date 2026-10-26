@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Show open pull requests below the issues, separated by a "Pull requests" heading.
+
 ## 0.2.2
 
 - Add the IssueView logo for the Marketplace and extension list.

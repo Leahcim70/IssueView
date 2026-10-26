@@ -1,7 +1,7 @@
 'use strict';
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { parseRemote, repositoryRemote, fetchIssues } = require('../src/github');
+const { parseRemote, repositoryRemote, fetchIssues, fetchPullRequests } = require('../src/github');
 
 test('HTTPS, SSH, SCP and Git remotes resolve to the same repository', () => {
   for (const remote of ['https://github.com/Owner/project.git', 'git@github.com:Owner/project.git', 'ssh://git@github.com/Owner/project', 'git://github.com/Owner/project.git', 'https://github.com/Owner/project/']) {
@@ -62,4 +62,13 @@ test('cancellation reaches the HTTP request', async () => {
   const controller = new AbortController();
   controller.abort();
   await assert.rejects(fetchIssues(repo, 'open', 1, 'token', controller.signal, async (_url, options) => { options.signal.throwIfAborted(); }), { name: 'AbortError' });
+});
+
+test('open pull requests are requested from the pulls endpoint', async () => {
+  const pulls = await fetchPullRequests(repo, 'token', signal(), async url => {
+    assert.equal(new URL(url).pathname, '/repos/owner/repo/pulls');
+    assert.equal(new URL(url).searchParams.get('state'), 'open');
+    return new Response('[{"number":3,"title":"PR"},{"title":"invalid"}]');
+  });
+  assert.deepEqual(pulls, [{ number: 3, title: 'PR' }]);
 });

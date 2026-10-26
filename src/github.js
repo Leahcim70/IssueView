@@ -34,12 +34,10 @@ function repositoryRemote(repository) {
   }
 }
 
-async function fetchIssues(repo, state, page, token, signal, request = fetch, t = (message, ...args) => message.replace(/\{(\d+)\}/g, (_, index) => String(args[index]))) {
-  if (!parseRemote(`https://github.com/${repo.fullName}`) ||
-      !['open', 'closed', 'all'].includes(state) || !Number.isSafeInteger(page) || page < 1) {
-    throw new Error(t("Invalid repository query."));
-  }
-  const url = `https://api.github.com/repos/${repo.fullName}/issues?state=${state}&sort=updated&direction=desc&per_page=100&page=${page}`;
+const format = (message, ...args) => message.replace(/\{(\d+)\}/g, (_, index) => String(args[index]));
+const isItem = item => item && Number.isSafeInteger(item.number) && item.number > 0 && typeof item.title === 'string';
+
+async function get(url, token, signal, request, t) {
   const response = await request(url, {
     headers: {
       Accept: 'application/vnd.github+json',
@@ -61,10 +59,23 @@ async function fetchIssues(repo, state, page, token, signal, request = fetch, t 
   }
   const data = await response.json();
   if (!Array.isArray(data)) throw new Error(t("Unexpected response from GitHub."));
-  return {
-    issues: data.filter(issue => issue && !issue.pull_request && Number.isSafeInteger(issue.number) && issue.number > 0 && typeof issue.title === 'string'),
-    hasMore: /rel="next"/.test(response.headers.get('link') || '')
-  };
+  return { data, hasMore: /rel="next"/.test(response.headers.get('link') || '') };
 }
 
-module.exports = { parseRemote, repositoryRemote, fetchIssues };
+async function fetchIssues(repo, state, page, token, signal, request = fetch, t = format) {
+  if (!parseRemote(`https://github.com/${repo.fullName}`) ||
+      !['open', 'closed', 'all'].includes(state) || !Number.isSafeInteger(page) || page < 1) {
+    throw new Error(t("Invalid repository query."));
+  }
+  const { data, hasMore } = await get(`https://api.github.com/repos/${repo.fullName}/issues?state=${state}&sort=updated&direction=desc&per_page=100&page=${page}`, token, signal, request, t);
+  return { issues: data.filter(issue => isItem(issue) && !issue.pull_request), hasMore };
+}
+
+// ponytail: only the 100 most recently updated open PRs; paginate if a repository needs more.
+async function fetchPullRequests(repo, token, signal, request = fetch, t = format) {
+  if (!parseRemote(`https://github.com/${repo.fullName}`)) throw new Error(t("Invalid repository query."));
+  const { data } = await get(`https://api.github.com/repos/${repo.fullName}/pulls?state=open&sort=updated&direction=desc&per_page=100`, token, signal, request, t);
+  return data.filter(isItem);
+}
+
+module.exports = { parseRemote, repositoryRemote, fetchIssues, fetchPullRequests };

@@ -1,12 +1,12 @@
 'use strict';
 const vscode = require('vscode');
-const { repositoryRemote, fetchIssues } = require('./github');
+const { repositoryRemote, fetchIssues, fetchPullRequests } = require('./github');
 
 async function activate(context) {
   const gitExtension = vscode.extensions.getExtension('vscode.git');
   const git = (await gitExtension.activate()).getAPI(1);
   const changed = new vscode.EventEmitter();
-  let rows = [], current, pinned, requestController, disposed = false;
+  let rows = [], pulls = [], current, pinned, requestController, disposed = false;
   let state = context.workspaceState.get('issueState', 'open');
   if (!['open', 'closed', 'all'].includes(state)) state = 'open';
   let page = 1, hasMore = false, busy = false;
@@ -34,18 +34,20 @@ async function activate(context) {
     return remote && { ...remote, root: repository.rootUri.toString() };
   }
 
-  function issueItem(issue, repo) {
+  function issueItem(issue, repo, pull = false) {
     const item = new vscode.TreeItem(`#${issue.number}  ${issue.title}`);
     item.id = `${repo.fullName}#${issue.number}`;
     item.description = (issue.labels || []).map(label => typeof label === 'string' ? label : label?.name).filter(Boolean).join(', ');
-    item.iconPath = new vscode.ThemeIcon(issue.state === 'closed' ? 'issue-closed' : 'issues',
-      new vscode.ThemeColor(issue.state === 'closed' ? 'charts.purple' : 'charts.green'));
+    item.iconPath = pull ? new vscode.ThemeIcon(issue.draft ? 'git-pull-request-draft' : 'git-pull-request',
+      new vscode.ThemeColor(issue.draft ? 'disabledForeground' : 'charts.green')) :
+      new vscode.ThemeIcon(issue.state === 'closed' ? 'issue-closed' : 'issues',
+        new vscode.ThemeColor(issue.state === 'closed' ? 'charts.purple' : 'charts.green'));
     const tooltip = new vscode.MarkdownString();
     tooltip.appendText(`#${issue.number} ${issue.title}\n\n${filters[issue.state] || issue.state}`);
     if (item.description) tooltip.appendText(`\n${vscode.l10n.t("Labels: {0}", item.description)}`);
     if (issue.body) tooltip.appendText(`\n\n${String(issue.body).slice(0, 1500)}`);
     item.tooltip = tooltip;
-    item.command = { command: 'projectIssues.openIssue', title: vscode.l10n.t("Open issue on GitHub"), arguments: [`https://github.com/${repo.fullName}/issues/${issue.number}`] };
+    item.command = { command: 'projectIssues.openIssue', title: vscode.l10n.t("Open issue on GitHub"), arguments: [`https://github.com/${repo.fullName}/${pull ? 'pull' : 'issues'}/${issue.number}`] };
     return item;
   }
 
@@ -77,8 +79,12 @@ async function activate(context) {
         message(vscode.l10n.t("Sign in to GitHub"), 'projectIssues.signIn');
         return;
       }
-      const result = await fetchIssues(repo, requestedState, targetPage, session.accessToken, controller.signal, fetch, vscode.l10n.t);
+      const [result, pullRequests] = await Promise.all([
+        fetchIssues(repo, requestedState, targetPage, session.accessToken, controller.signal, fetch, vscode.l10n.t),
+        more ? undefined : fetchPullRequests(repo, session.accessToken, controller.signal, fetch, vscode.l10n.t)
+      ]);
       if (controller.signal.aborted) return;
+      if (pullRequests) pulls = pullRequests.map(pull => Object.assign(issueItem(pull, repo, true), { contextValue: 'pullRequest' }));
       page = targetPage;
       hasMore = result.hasMore;
       const existing = new Set(previousRows.map(item => item.id));
@@ -89,8 +95,13 @@ async function activate(context) {
         next.command = { command: 'projectIssues.loadMore', title: vscode.l10n.t("Load more issues") };
         rows.push(next);
       }
-      if (!rows.length) message(vscode.l10n.t("No issues for this status."));
-      else changed.fire();
+      if (!rows.length) rows.push(new vscode.TreeItem(vscode.l10n.t("No issues for this status.")));
+      if (pulls.length) {
+        const separator = new vscode.TreeItem(vscode.l10n.t("Pull requests"));
+        separator.description = String(pulls.length);
+        rows.push(separator, ...pulls);
+      }
+      changed.fire();
     } catch (error) {
       if (!controller.signal.aborted && error.status === 404 && !session?.scopes?.includes('repo')) {
         message(vscode.l10n.t("Repository not found. Private repository? Grant access"), 'projectIssues.signInPrivate');
@@ -150,7 +161,7 @@ async function activate(context) {
       if (choice) { pinned = choice.repository; await refresh(); }
     }),
     vscode.commands.registerCommand('projectIssues.openIssue', url => {
-      if (typeof url === 'string' && /^https:\/\/github\.com\/[a-z\d-]+\/[a-z\d_.-]+\/issues\/\d+$/i.test(url)) {
+      if (typeof url === 'string' && /^https:\/\/github\.com\/[a-z\d-]+\/[a-z\d_.-]+\/(?:issues|pull)\/\d+$/i.test(url)) {
         return vscode.env.openExternal(vscode.Uri.parse(url));
       }
     }),

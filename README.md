@@ -9,7 +9,8 @@ GitHub issues for your current project, directly in Visual Studio Code's **secon
 - Detects the current GitHub repository from Git remotes.
 - Shows issue numbers, titles, labels and a description preview.
 - Opens issues on GitHub with one click.
-- Filters open, closed or all issues; excludes pull requests.
+- Filters open, closed or all issues.
+- Lists open pull requests below the issues under a "Pull requests" heading.
 - Follows the active file's repository or pins a selected repository.
 - Supports public and private GitHub.com repositories through VS Code's built-in sign-in.
 - **English and German UI**, following VS Code's display language.
@@ -19,7 +20,7 @@ GitHub issues for your current project, directly in Visual Studio Code's **secon
 
 Requires **VS Code 1.106+** on Windows, macOS or Linux.
 
-1. Download `issueview-0.2.2.vsix` from the [latest release](https://github.com/Leahcim70/IssueView/releases/latest).
+1. Download `issueview-0.3.0.vsix` from the [latest release](https://github.com/Leahcim70/IssueView/releases/latest).
 2. In VS Code, open **Extensions → … → Install from VSIX…** and select it.
 3. Open a trusted project folder with a GitHub remote.
 4. In **IssueView**, select **Sign in to GitHub**.
@@ -27,7 +28,7 @@ Requires **VS Code 1.106+** on Windows, macOS or Linux.
 If the sidebar is hidden, enable **View → Appearance → Secondary Side Bar**, or use **View: Open View… → IssueView**. Placement follows your VS Code layout.
 
 ```sh
-code --install-extension issueview-0.2.2.vsix
+code --install-extension issueview-0.3.0.vsix
 ```
 
 The prototype used the extension name `project-issues-sidebar`. Uninstall it before installing IssueView to avoid duplicate views.
@@ -59,7 +60,7 @@ npm test
 npm run package
 ```
 
-Packaging writes `dist/issueview-0.2.2.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release.
+Packaging writes `dist/issueview-0.3.0.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release.
 
 Tests cover repository detection, safe API targets, authentication headers, pagination, errors, cancellation, project switches during requests, both UI languages and translation completeness. The actual GitHub OAuth flow requires a manual check with an authorized account.
 

@@ -53,7 +53,9 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
   const originalLoad = Module._load;
   const originalFetch = global.fetch;
   const pending = [];
-  global.fetch = (url, options) => new Promise(resolve => pending.push({ url, options, resolve }));
+  global.fetch = (url, options) => new URL(url).pathname.endsWith('/pulls')
+    ? Promise.resolve(new Response('[{"number":7,"title":"Feature","state":"open","draft":true}]'))
+    : new Promise(resolve => pending.push({ url, options, resolve }));
   Module._load = function (name, ...args) { return name === 'vscode' ? vscode : originalLoad.call(this, name, ...args); };
   const flush = () => new Promise(resolve => setImmediate(resolve));
   const reply = (request, number, title) => request.resolve(new Response(JSON.stringify([{ number, title, state: 'open', labels: [{ name: 'bug' }], body: '[unsafe](command:bad)' }])));
@@ -80,6 +82,12 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     const item = provider.getChildren()[0];
     await commands.get(item.command.command)(...item.command.arguments);
     assert.deepEqual(opened, ['https://github.com/owner/second/issues/22']);
+    const [, separator, pull] = provider.getChildren();
+    assert.equal(separator.label, t('Pull requests'));
+    assert.equal(separator.command, undefined);
+    assert.equal(pull.label, '#7  Feature');
+    await commands.get(pull.command.command)(...pull.command.arguments);
+    assert.equal(opened.pop(), 'https://github.com/owner/second/pull/7');
     await commands.get('projectIssues.openIssue')('https://evil.test/secret');
     assert.equal(opened.length, 1);
     picker = { value: 'closed' };
