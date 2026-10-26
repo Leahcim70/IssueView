@@ -60,7 +60,7 @@ npm test
 npm run package
 ```
 
-Packaging writes `dist/issueview-0.3.0.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release; publishing the release uploads that VSIX to the VS Code Marketplace (`.github/workflows/marketplace.yml`).
+Packaging writes `dist/issueview-0.3.0.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release; publishing the release uploads that VSIX to the VS Code Marketplace. See [PUBLISHING.md](PUBLISHING.md) (German).
 
 Tests cover repository detection, safe API targets, authentication headers, pagination, errors, cancellation, project switches during requests, both UI languages and translation completeness. The actual GitHub OAuth flow requires a manual check with an authorized account.
 
