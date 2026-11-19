@@ -7,7 +7,7 @@ GitHub issues for your current project, directly in Visual Studio Code's **secon
 ## Features
 
 - Detects the current GitHub repository from Git remotes.
-- Shows issue numbers, titles, labels and a description preview.
+- Shows issue numbers, titles, assigned accounts, labels and a description preview.
 - Opens issues on GitHub with one click.
 - Right-click an issue to assign yourself or set its GitHub Project status to **In progress**.
 - Highlights open issues that are **In progress** with a yellow wrench icon and a status label.
@@ -22,7 +22,7 @@ GitHub issues for your current project, directly in Visual Studio Code's **secon
 
 Requires **VS Code 1.106+** on Windows, macOS or Linux.
 
-1. Download `issueview-0.4.0.vsix` from the [latest release](https://github.com/Leahcim70/IssueView/releases/latest).
+1. Download `issueview-0.4.1.vsix` from the [latest release](https://github.com/Leahcim70/IssueView/releases/latest).
 2. In VS Code, open **Extensions → … → Install from VSIX…** and select it.
 3. Open a trusted project folder with a GitHub remote.
 4. In **IssueView**, select **Sign in to GitHub**.
@@ -30,7 +30,7 @@ Requires **VS Code 1.106+** on Windows, macOS or Linux.
 If the sidebar is hidden, enable **View → Appearance → Secondary Side Bar**, or use **View: Open View… → IssueView**. Placement follows your VS Code layout.
 
 ```sh
-code --install-extension issueview-0.4.0.vsix
+code --install-extension issueview-0.4.1.vsix
 ```
 
 The prototype used the extension name `project-issues-sidebar`. Uninstall it before installing IssueView to avoid duplicate views.
@@ -44,6 +44,8 @@ Use **Configure Display Language** in the command palette to change VS Code's di
 The toolbar provides **Refresh**, **Filter by status**, and **Select repository**. Automatic mode uses the active editor's repository, falling back to the first detected Git repository. Remote selection prefers the current branch's upstream, then `origin`, then another recognized GitHub remote.
 
 **Load more issues** fetches the next API page. Pages may contain fewer than 100 issues because pull requests are excluded. Use Refresh for updates; there is no periodic polling.
+
+Assigned accounts appear as **@username** in the issue row and in the tooltip. All assignees are shown; unassigned issues have no assignment label.
 
 Right-click an issue and choose **Assign to me** to add your signed-in GitHub account as an assignee, keeping existing assignees. **Start implementation** sets the issue's **Status** field to **In progress** in its GitHub Project. If it belongs to several active projects, choose the project to update. The issue must already belong to a project with that field and option; closed projects and archived items are excluded. Missing project setup or permissions produces an error message. These actions are separate: starting implementation does not assign the issue.
 
@@ -66,7 +68,7 @@ npm test
 npm run package
 ```
 
-Packaging writes `dist/issueview-0.4.0.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release; publishing the release uploads that VSIX to the VS Code Marketplace. See [PUBLISHING.md](PUBLISHING.md) (German).
+Packaging writes `dist/issueview-0.4.1.vsix`. The VSIX includes source code, translations, documentation, tests and packaging script. Attach the tested build to a GitHub release; publishing the release uploads that VSIX to the VS Code Marketplace. See [PUBLISHING.md](PUBLISHING.md) (German).
 
 Tests cover repository detection, safe API targets, authentication headers, pagination, errors, cancellation, project switches during requests, both UI languages and translation completeness. The actual GitHub OAuth flow requires a manual check with an authorized account.
 

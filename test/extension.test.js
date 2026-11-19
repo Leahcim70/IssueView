@@ -85,6 +85,7 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     await signIn;
     assert.equal(provider.getChildren()[0].label, '#22  Current project');
     assert.equal(provider.getChildren()[0].description, 'bug');
+    assert.ok(!provider.getChildren()[0].tooltip.value.includes(t('Assigned to: {0}', '')));
     const item = provider.getChildren()[0];
     await commands.get(item.command.command)(...item.command.arguments);
     assert.deepEqual(opened, ['https://github.com/owner/second/issues/22']);
@@ -158,7 +159,8 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
         if (url.includes('/pulls?')) return response([{ number: 7, title: 'Feature', state: 'open', draft: true }]);
         const more = new URL(url).searchParams.get('page') === '2';
         return new Response(JSON.stringify((more ? [4] : [1, 2, 3]).map(number => ({
-          number, title: `Issue ${number}`, state: number === 3 ? 'closed' : 'open', labels: [{ name: 'bug' }]
+          number, title: `Issue ${number}`, state: number === 3 ? 'closed' : 'open', labels: [{ name: 'bug' }],
+          assignees: number === 2 ? [] : number === 1 ? [{ login: 'alice' }, { login: 'bob' }] : [{ login: 'alice' }]
         }))), { headers: more ? {} : { link: '<https://api.github.com/next>; rel="next"' } });
       }
       return response([]);
@@ -234,14 +236,18 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     let [working, waiting, closed] = provider.getChildren();
     assert.equal(working.iconPath.id, 'wrench');
     assert.equal(working.iconPath.color.id, 'charts.yellow');
-    assert.equal(working.description, `${t('In progress')} · bug`);
+    assert.equal(working.description, `${t('In progress')} · @alice, @bob · bug`);
+    assert.ok(working.tooltip.value.includes(t('Assigned to: {0}', '@alice, @bob')));
     assert.ok(working.tooltip.value.includes(t('Project status: In progress')));
     assert.ok(working.tooltip.value.includes(t('Labels: {0}', 'bug')));
     assert.equal(waiting.iconPath.id, 'issues');
     assert.equal(waiting.iconPath.color.id, 'charts.green');
     assert.equal(waiting.description, 'bug');
+    assert.ok(!waiting.tooltip.value.includes(t('Assigned to: {0}', '')));
     assert.equal(closed.iconPath.id, 'issue-closed');
     assert.equal(closed.iconPath.color.id, 'charts.purple');
+    assert.equal(closed.description, '@alice · bug');
+    assert.ok(closed.tooltip.value.includes(t('Assigned to: {0}', '@alice')));
     const draft = provider.getChildren(provider.getChildren().find(row => row.id === 'pullRequests'))[0];
     assert.equal(draft.iconPath.id, 'git-pull-request-draft');
     assert.equal(draft.iconPath.color.id, 'disabledForeground');
@@ -251,6 +257,7 @@ for (const locale of ['en', 'de']) test(`sidebar handles sign-in, stale requests
     assert.equal(issueRows.length, 4);
     assert.equal(issueRows[0].iconPath.id, 'wrench');
     assert.equal(issueRows[3].iconPath.id, 'wrench');
+    assert.equal(issueRows[3].description, `${t('In progress')} · @alice · bug`);
     projectStatus = 'Todo';
     await commands.get('projectIssues.refresh')();
     working = provider.getChildren()[0];

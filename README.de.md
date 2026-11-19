@@ -8,7 +8,7 @@ Zeigt die GitHub-Issues des geöffneten Projekts direkt in der **sekundären Sei
 
 ## Installation
 
-1. Die Datei `issueview-0.4.0.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
+1. Die Datei `issueview-0.4.1.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
 2. VS Code: Erweiterungen → `…` → **Aus VSIX installieren… / Install from VSIX…**.
 3. Einen vertrauenswürdigen lokalen Projektordner mit GitHub-Git-Remote öffnen.
 4. Rechts **IssueView → Bei GitHub anmelden** anklicken und die Anmeldung bestätigen.
@@ -18,7 +18,7 @@ Falls die rechte Seitenleiste ausgeblendet ist: **Ansicht → Darstellung → Se
 Alternativ zur Installation über das Menü:
 
 ```sh
-code --install-extension issueview-0.4.0.vsix
+code --install-extension issueview-0.4.1.vsix
 ```
 
 Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installation von IssueView deinstallieren, um doppelte Ansichten zu vermeiden.
@@ -26,6 +26,7 @@ Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installatio
 ## Bedienung
 
 - Zeigt standardmäßig offene Issues mit Nummer, Titel und Labels, sortiert nach letzter Änderung.
+- Zugewiesene Konten erscheinen als **@Benutzername** direkt in der Issue-Zeile und im Tooltip. Bei mehreren Zuweisungen werden alle Konten angezeigt; ohne Zuweisung entfällt der Zusatz.
 - Ein Klick öffnet das Issue im Browser. Ein Tooltip zeigt einen Auszug aus der Beschreibung als sicheren Text.
 - Rechtsklick → **Übernehmen** fügt dein angemeldetes GitHub-Konto als Assignee hinzu. Bestehende Assignees bleiben erhalten.
 - Rechtsklick → **Starte Umsetzung** setzt das Feld **Status** des Issues im GitHub Project auf **In progress**. Bei mehreren aktiven Projects wählst du das gewünschte aus. Das Issue muss bereits einem Project mit diesem Feld und dieser Option angehören; geschlossene Projects und archivierte Einträge werden ausgeschlossen. Fehlende Einrichtung oder Berechtigungen werden als Fehler gemeldet. Die beiden Aktionen sind unabhängig: „Starte Umsetzung“ weist das Issue nicht zusätzlich zu.
@@ -54,7 +55,7 @@ npm test
 npm run package
 ```
 
-Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.4.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
+Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.4.1.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
 
 Technische Referenzen:
 - https://code.visualstudio.com/updates/v1_106 (Secondary Side Bar contribution)

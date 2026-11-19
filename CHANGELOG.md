@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Show assigned GitHub accounts directly in issue rows and in a localized tooltip, including issues with multiple assignees.
+
 ## 0.4.0
 
 - Highlight open issues with an In progress Project status using a yellow wrench icon and a localized status label; load statuses in batches and offer project read access when needed.

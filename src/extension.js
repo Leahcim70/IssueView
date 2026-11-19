@@ -41,8 +41,9 @@ async function activate(context) {
     item.id = `${repo.fullName}#${issue.number}`;
     if (!pull) issueTargets.set(item, { repo, number: issue.number });
     const labels = (issue.labels || []).map(label => typeof label === 'string' ? label : label?.name).filter(Boolean).join(', ');
+    const assignees = !pull && (issue.assignees || []).map(user => user?.login).filter(Boolean).map(login => `@${login}`).join(', ');
     inProgress = inProgress && !pull && issue.state !== 'closed';
-    item.description = [inProgress && vscode.l10n.t("In progress"), labels].filter(Boolean).join(' · ');
+    item.description = [inProgress && vscode.l10n.t("In progress"), assignees, labels].filter(Boolean).join(' · ');
     item.iconPath = pull ? new vscode.ThemeIcon(issue.draft ? 'git-pull-request-draft' : 'git-pull-request',
       new vscode.ThemeColor(issue.draft ? 'disabledForeground' : 'charts.green')) :
       new vscode.ThemeIcon(issue.state === 'closed' ? 'issue-closed' : inProgress ? 'wrench' : 'issues',
@@ -50,6 +51,7 @@ async function activate(context) {
     const tooltip = new vscode.MarkdownString();
     tooltip.appendText(`#${issue.number} ${issue.title}\n\n${filters[issue.state] || issue.state}`);
     if (inProgress) tooltip.appendText(`\n${vscode.l10n.t("Project status: In progress")}`);
+    if (assignees) tooltip.appendText(`\n${vscode.l10n.t("Assigned to: {0}", assignees)}`);
     if (labels) tooltip.appendText(`\n${vscode.l10n.t("Labels: {0}", labels)}`);
     if (issue.body) tooltip.appendText(`\n\n${String(issue.body).slice(0, 1500)}`);
     item.tooltip = tooltip;
