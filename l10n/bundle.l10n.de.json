@@ -25,5 +25,18 @@
   "{0} – Try again": "{0} – Erneut versuchen",
   "GitHub request failed (HTTP {0}).": "GitHub-Anfrage fehlgeschlagen (HTTP {0}).",
   "Repository not found. Private repository? Grant access": "Repository nicht gefunden. Privates Repository? Zugriff erlauben",
-  "Pull requests": "Pull Requests"
+  "Pull requests": "Pull Requests",
+  "GitHub did not assign you to this issue. Check your repository permissions.": "GitHub hat dich diesem Issue nicht zugewiesen. Prüfe deine Repository-Berechtigungen.",
+  "GitHub could not access or update the project. Check your project permissions.": "GitHub konnte das Project nicht lesen oder aktualisieren. Prüfe deine Project-Berechtigungen.",
+  "This project needs a Status field with an In progress option.": "Dieses Project benötigt ein Feld „Status“ mit der Option „In progress“.",
+  "This issue does not belong to an active GitHub Project. Add it to a project first.": "Dieses Issue gehört zu keinem aktiven GitHub Project. Füge es zuerst einem Project hinzu.",
+  "Which project should be set to In progress?": "In welchem Project soll der Status auf „In progress“ gesetzt werden?",
+  "Issue #{0}: status in {1} set to In progress.": "Issue #{0}: Status in {1} auf „In progress“ gesetzt.",
+  "Issue #{0} is now assigned to you.": "Issue #{0} ist jetzt dir zugewiesen.",
+  "Could not update issue #{0}: {1}": "Issue #{0} konnte nicht aktualisiert werden: {1}",
+  "In progress": "In Bearbeitung",
+  "Project status: In progress": "Project-Status: In progress",
+  "Project status unavailable – Try again": "Project-Status nicht verfügbar – Erneut versuchen",
+  "Show project status – Grant access": "Project-Status anzeigen – Zugriff erlauben",
+  "Load project status": "Project-Status laden"
 }

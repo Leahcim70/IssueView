@@ -8,7 +8,7 @@ Zeigt die GitHub-Issues des geöffneten Projekts direkt in der **sekundären Sei
 
 ## Installation
 
-1. Die Datei `issueview-0.3.1.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
+1. Die Datei `issueview-0.4.0.vsix` aus dem [neuesten Release](https://github.com/Leahcim70/IssueView/releases/latest) herunterladen.
 2. VS Code: Erweiterungen → `…` → **Aus VSIX installieren… / Install from VSIX…**.
 3. Einen vertrauenswürdigen lokalen Projektordner mit GitHub-Git-Remote öffnen.
 4. Rechts **IssueView → Bei GitHub anmelden** anklicken und die Anmeldung bestätigen.
@@ -18,7 +18,7 @@ Falls die rechte Seitenleiste ausgeblendet ist: **Ansicht → Darstellung → Se
 Alternativ zur Installation über das Menü:
 
 ```sh
-code --install-extension issueview-0.3.1.vsix
+code --install-extension issueview-0.4.0.vsix
 ```
 
 Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installation von IssueView deinstallieren, um doppelte Ansichten zu vermeiden.
@@ -27,6 +27,9 @@ Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installatio
 
 - Zeigt standardmäßig offene Issues mit Nummer, Titel und Labels, sortiert nach letzter Änderung.
 - Ein Klick öffnet das Issue im Browser. Ein Tooltip zeigt einen Auszug aus der Beschreibung als sicheren Text.
+- Rechtsklick → **Übernehmen** fügt dein angemeldetes GitHub-Konto als Assignee hinzu. Bestehende Assignees bleiben erhalten.
+- Rechtsklick → **Starte Umsetzung** setzt das Feld **Status** des Issues im GitHub Project auf **In progress**. Bei mehreren aktiven Projects wählst du das gewünschte aus. Das Issue muss bereits einem Project mit diesem Feld und dieser Option angehören; geschlossene Projects und archivierte Einträge werden ausgeschlossen. Fehlende Einrichtung oder Berechtigungen werden als Fehler gemeldet. Die beiden Aktionen sind unabhängig: „Starte Umsetzung“ weist das Issue nicht zusätzlich zu.
+- Offene Issues mit **In progress** in mindestens einem aktiven GitHub Project erhalten ein **gelbes Schraubenschlüssel-Symbol** und den Zusatz **In Bearbeitung**. Geschlossene Issues behalten ihr violettes Symbol. Der Project-Status wird beim Laden und Aktualisieren gebündelt abgefragt, auch nach **Starte Umsetzung**. Fehlt der Zugriff, klicke auf **Project-Status anzeigen – Zugriff erlauben**. Bei Fehlern bleibt die Issue-Liste mit einem Eintrag zum erneuten Laden verfügbar.
 - **Aktualisieren** lädt den aktuellen Stand. Es gibt kein periodisches Hintergrund-Polling.
 - **Status filtern** wechselt zwischen offen, geschlossen und allen Issues.
 - **Repository auswählen** erlaubt bei mehreren Projekten eine feste Auswahl. Im automatischen Modus folgt die Ansicht dem Repository der aktiven Datei; ohne aktive Datei verwendet sie das erste erkannte Git-Repository.
@@ -38,7 +41,7 @@ Die frühere Version hieß `project-issues-sidebar`. Diese bitte vor Installatio
 
 Verwendet den eingebauten GitHub-Anmeldedienst von VS Code. Tokens werden weder in Einstellungen geschrieben noch protokolliert. Anfragen gehen ausschließlich an `https://api.github.com`; Browser-Links ausschließlich an `https://github.com`.
 
-Die Anmeldung fordert nur die Berechtigung `read:user` an; das genügt für öffentliche Repositories. Private Repositories benötigen zusätzlich die OAuth-Berechtigung `repo`. IssueView fragt sie erst an, wenn ein Repository nicht gefunden wird, oder über **IssueView: Zugriff auf private Repositories erlauben**. Diese GitHub-Berechtigung ist technisch umfassender als reiner Lesezugriff; die Erweiterung selbst führt ausschließlich lesende API-Anfragen aus. Organisationen mit SSO können eine zusätzliche Freigabe benötigen. Abmelden bzw. Zugriff widerrufen ist über die VS-Code-Kontoverwaltung möglich.
+Die Anmeldung fordert nur die Berechtigung `read:user` an; das genügt zum Lesen öffentlicher Repositories. Zum Lesen privater Repositories und zum Übernehmen von Issues wird die OAuth-Berechtigung `repo` benötigt. Zum Anzeigen des Project-Status werden `repo` und `read:project` angefragt; eine bestehende Sitzung mit `repo` und `project` wird ebenfalls verwendet. „Starte Umsetzung“ benötigt zusätzlich `project`. IssueView fragt diese Berechtigungen bei Bedarf an; privaten Repository-Zugriff kannst du auch über **IssueView: Zugriff auf private Repositories erlauben** freigeben. Schreibende Anfragen erfolgen nur beim Aufruf einer Issue-Kontextmenüaktion. Dein Konto benötigt außerdem Bearbeitungsrechte für das Issue bzw. Project. Organisationen mit SSO können eine zusätzliche Freigabe benötigen. Abmelden bzw. Zugriff widerrufen ist über die VS-Code-Kontoverwaltung möglich.
 
 Unterstützt GitHub.com, einschließlich dort gehosteter privater Organisations-Repositories. GitLab, Azure DevOps, eigene GitHub-Enterprise-Server und reine virtuelle Browser-Workspaces sind in dieser Version nicht enthalten. Ein SSH-Hostalias anstelle von `github.com` wird nicht aufgelöst.
 
@@ -51,7 +54,7 @@ npm test
 npm run package
 ```
 
-Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.3.1.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
+Die Tests benötigen Node.js 22 oder neuer; die Paketierung Python 3. Die Erweiterung nutzt die in VS Code enthaltene Node.js-Laufzeit. Ein `npm install` ist nicht erforderlich. Die Paketierung schreibt `dist/issueview-0.4.0.vsix` und erzeugt eine installierbare VSIX ohne Veröffentlichung im Marketplace. Die getestete VSIX wird an ein GitHub-Release angehängt; beim Veröffentlichen des Releases lädt ein Workflow sie in den VS Code Marketplace, siehe [PUBLISHING.md](PUBLISHING.md).
 
 Technische Referenzen:
 - https://code.visualstudio.com/updates/v1_106 (Secondary Side Bar contribution)

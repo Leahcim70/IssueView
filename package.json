@@ -2,7 +2,7 @@
   "name": "issueview",
   "displayName": "IssueView",
   "description": "%extension.description%",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "publisher": "michael-lantzen",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -72,6 +72,14 @@
         "command": "projectIssues.selectRepository",
         "title": "%command.selectRepository%",
         "icon": "$(repo)"
+      },
+      {
+        "command": "projectIssues.takeIssue",
+        "title": "%command.takeIssue%"
+      },
+      {
+        "command": "projectIssues.startImplementation",
+        "title": "%command.startImplementation%"
       }
     ],
     "menus": {
@@ -98,6 +106,28 @@
         {
           "command": "projectIssues.signInPrivate",
           "when": "view == projectIssues.list"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "projectIssues.takeIssue",
+          "when": "view == projectIssues.list && viewItem == issue",
+          "group": "issueActions@1"
+        },
+        {
+          "command": "projectIssues.startImplementation",
+          "when": "view == projectIssues.list && viewItem == issue",
+          "group": "issueActions@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "projectIssues.takeIssue",
+          "when": "false"
+        },
+        {
+          "command": "projectIssues.startImplementation",
+          "when": "false"
         }
       ]
     }

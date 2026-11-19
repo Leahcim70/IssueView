@@ -35,6 +35,14 @@ test('manifest contributions resolve in both languages with IssueView branding',
   for (const match of JSON.stringify(manifest).matchAll(/%([^%]+)%/g)) {
     assert.ok(en[match[1]], match[1]); assert.ok(de[match[1]], match[1]);
   }
+  const actions = manifest.contributes.menus['view/item/context'];
+  assert.deepEqual(actions.map(action => action.command), ['projectIssues.takeIssue', 'projectIssues.startImplementation']);
+  for (const action of actions) {
+    assert.equal(action.when, 'view == projectIssues.list && viewItem == issue');
+    assert.ok(manifest.contributes.commands.some(command => command.command === action.command));
+  }
+  assert.equal(de['command.takeIssue'], 'Übernehmen');
+  assert.equal(de['command.startImplementation'], 'Starte Umsetzung');
 });
 
 test('GitHub errors are translated with the actual HTTP status', async () => {

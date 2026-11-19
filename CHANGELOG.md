@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Highlight open issues with an In progress Project status using a yellow wrench icon and a localized status label; load statuses in batches and offer project read access when needed.
+- Add issue context menu actions to assign yourself and set GitHub Project status to In progress, with project selection when needed.
+- Request write permissions on demand and report assignment or project update failures in English and German.
+
 ## 0.3.1
 
 - Make the "Pull requests" group collapsible.
