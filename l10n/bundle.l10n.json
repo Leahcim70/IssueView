@@ -25,5 +25,18 @@
   "{0} – Try again": "{0} – Try again",
   "GitHub request failed (HTTP {0}).": "GitHub request failed (HTTP {0}).",
   "Repository not found. Private repository? Grant access": "Repository not found. Private repository? Grant access",
-  "Pull requests": "Pull requests"
+  "Pull requests": "Pull requests",
+  "GitHub did not assign you to this issue. Check your repository permissions.": "GitHub did not assign you to this issue. Check your repository permissions.",
+  "GitHub could not access or update the project. Check your project permissions.": "GitHub could not access or update the project. Check your project permissions.",
+  "This project needs a Status field with an In progress option.": "This project needs a Status field with an In progress option.",
+  "This issue does not belong to an active GitHub Project. Add it to a project first.": "This issue does not belong to an active GitHub Project. Add it to a project first.",
+  "Which project should be set to In progress?": "Which project should be set to In progress?",
+  "Issue #{0}: status in {1} set to In progress.": "Issue #{0}: status in {1} set to In progress.",
+  "Issue #{0} is now assigned to you.": "Issue #{0} is now assigned to you.",
+  "Could not update issue #{0}: {1}": "Could not update issue #{0}: {1}",
+  "In progress": "In progress",
+  "Project status: In progress": "Project status: In progress",
+  "Project status unavailable – Try again": "Project status unavailable – Try again",
+  "Show project status – Grant access": "Show project status – Grant access",
+  "Load project status": "Load project status"
 }

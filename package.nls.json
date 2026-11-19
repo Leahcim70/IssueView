@@ -5,5 +5,7 @@
   "command.signIn": "IssueView: Sign in to GitHub",
   "command.filter": "IssueView: Filter by status",
   "command.selectRepository": "IssueView: Select repository",
-  "command.signInPrivate": "IssueView: Grant access to private repositories"
+  "command.signInPrivate": "IssueView: Grant access to private repositories",
+  "command.takeIssue": "Assign to me",
+  "command.startImplementation": "Start implementation"
 }

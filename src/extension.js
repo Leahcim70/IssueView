@@ -1,6 +1,6 @@
 'use strict';
 const vscode = require('vscode');
-const { repositoryRemote, fetchIssues, fetchPullRequests } = require('./github');
+const { repositoryRemote, fetchIssues, fetchPullRequests, assignIssueToMe, fetchIssueProjects, fetchInProgressIssues, startIssueProgress } = require('./github');
 
 async function activate(context) {
   const gitExtension = vscode.extensions.getExtension('vscode.git');
@@ -10,6 +10,8 @@ async function activate(context) {
   let state = context.workspaceState.get('issueState', 'open');
   if (!['open', 'closed', 'all'].includes(state)) state = 'open';
   let page = 1, hasMore = false, busy = false;
+  const issueTargets = new WeakMap();
+  const actions = new Map();
   const filters = { open: vscode.l10n.t("Open"), closed: vscode.l10n.t("Closed"), all: vscode.l10n.t("All") };
   const provider = {
     onDidChangeTreeData: changed.event,
@@ -34,17 +36,21 @@ async function activate(context) {
     return remote && { ...remote, root: repository.rootUri.toString() };
   }
 
-  function issueItem(issue, repo, pull = false) {
+  function issueItem(issue, repo, pull = false, inProgress = false) {
     const item = new vscode.TreeItem(`#${issue.number}  ${issue.title}`);
     item.id = `${repo.fullName}#${issue.number}`;
-    item.description = (issue.labels || []).map(label => typeof label === 'string' ? label : label?.name).filter(Boolean).join(', ');
+    if (!pull) issueTargets.set(item, { repo, number: issue.number });
+    const labels = (issue.labels || []).map(label => typeof label === 'string' ? label : label?.name).filter(Boolean).join(', ');
+    inProgress = inProgress && !pull && issue.state !== 'closed';
+    item.description = [inProgress && vscode.l10n.t("In progress"), labels].filter(Boolean).join(' · ');
     item.iconPath = pull ? new vscode.ThemeIcon(issue.draft ? 'git-pull-request-draft' : 'git-pull-request',
       new vscode.ThemeColor(issue.draft ? 'disabledForeground' : 'charts.green')) :
-      new vscode.ThemeIcon(issue.state === 'closed' ? 'issue-closed' : 'issues',
-        new vscode.ThemeColor(issue.state === 'closed' ? 'charts.purple' : 'charts.green'));
+      new vscode.ThemeIcon(issue.state === 'closed' ? 'issue-closed' : inProgress ? 'wrench' : 'issues',
+        new vscode.ThemeColor(issue.state === 'closed' ? 'charts.purple' : inProgress ? 'charts.yellow' : 'charts.green'));
     const tooltip = new vscode.MarkdownString();
     tooltip.appendText(`#${issue.number} ${issue.title}\n\n${filters[issue.state] || issue.state}`);
-    if (item.description) tooltip.appendText(`\n${vscode.l10n.t("Labels: {0}", item.description)}`);
+    if (inProgress) tooltip.appendText(`\n${vscode.l10n.t("Project status: In progress")}`);
+    if (labels) tooltip.appendText(`\n${vscode.l10n.t("Labels: {0}", labels)}`);
     if (issue.body) tooltip.appendText(`\n\n${String(issue.body).slice(0, 1500)}`);
     item.tooltip = tooltip;
     item.command = { command: 'projectIssues.openIssue', title: vscode.l10n.t("Open issue on GitHub"), arguments: [`https://github.com/${repo.fullName}/${pull ? 'pull' : 'issues'}/${issue.number}`] };
@@ -71,8 +77,10 @@ async function activate(context) {
         message(vscode.l10n.t("Open a project with a GitHub remote."));
         return;
       }
-      // Read issues with a minimal token; only private repositories need the broad 'repo' scope.
-      session = await vscode.authentication.getSession('github', ['repo'], { silent: true }) ||
+      // Reuse granted scopes without prompting; initial sign-in only requests read:user.
+      session = await vscode.authentication.getSession('github', ['repo', 'project'], { silent: true }) ||
+        await vscode.authentication.getSession('github', ['repo', 'read:project'], { silent: true }) ||
+        await vscode.authentication.getSession('github', ['repo'], { silent: true }) ||
         await vscode.authentication.getSession('github', ['read:user'], { silent: true });
       if (controller.signal.aborted) return;
       if (!session) {
@@ -84,11 +92,27 @@ async function activate(context) {
         more ? undefined : fetchPullRequests(repo, session.accessToken, controller.signal, fetch, vscode.l10n.t)
       ]);
       if (controller.signal.aborted) return;
+      let inProgress = new Set(), statusNotice;
+      if (result.issues.some(issue => issue.state !== 'closed')) {
+        if (session.scopes?.some(scope => ['project', 'read:project'].includes(scope))) {
+          try {
+            inProgress = await fetchInProgressIssues(repo, result.issues, session.accessToken, controller.signal, fetch, vscode.l10n.t);
+          } catch (error) {
+            statusNotice = new vscode.TreeItem(vscode.l10n.t("Project status unavailable – Try again"));
+            statusNotice.tooltip = error.message;
+            statusNotice.command = { command: 'projectIssues.refresh', title: vscode.l10n.t("Load project status") };
+          }
+        } else {
+          statusNotice = new vscode.TreeItem(vscode.l10n.t("Show project status – Grant access"));
+          statusNotice.command = { command: 'projectIssues.signInProjects', title: vscode.l10n.t("Load project status") };
+        }
+      }
+      if (controller.signal.aborted) return;
       if (pullRequests) pulls = pullRequests.map(pull => Object.assign(issueItem(pull, repo, true), { contextValue: 'pullRequest' }));
       page = targetPage;
       hasMore = result.hasMore;
       const existing = new Set(previousRows.map(item => item.id));
-      rows = [...previousRows, ...result.issues.map(issue => issueItem(issue, repo)).filter(item => !existing.has(item.id))];
+      rows = [...previousRows, ...result.issues.map(issue => issueItem(issue, repo, false, inProgress.has(issue.number))).filter(item => !existing.has(item.id))];
       for (const item of rows) item.contextValue = 'issue';
       if (hasMore) {
         const next = new vscode.TreeItem(vscode.l10n.t("Load more issues…"));
@@ -96,6 +120,7 @@ async function activate(context) {
         rows.push(next);
       }
       if (!rows.length) rows.push(new vscode.TreeItem(vscode.l10n.t("No issues for this status.")));
+      if (statusNotice) rows.push(statusNotice);
       if (pulls.length) {
         const group = new vscode.TreeItem(vscode.l10n.t("Pull requests"), vscode.TreeItemCollapsibleState.Expanded);
         group.id = 'pullRequests';
@@ -124,6 +149,40 @@ async function activate(context) {
     } catch { vscode.window.showErrorMessage(vscode.l10n.t("GitHub sign-in was cancelled or failed.")); }
   }
 
+  async function updateIssue(item, start) {
+    const target = issueTargets.get(item);
+    if (disposed || !target || actions.has(item.id)) return;
+    const { repo, number } = target;
+    const controller = new AbortController();
+    actions.set(item.id, controller);
+    try {
+      const session = await vscode.authentication.getSession('github', ['repo', 'project'], { silent: true }) ||
+        await vscode.authentication.getSession('github', start ? ['repo', 'project'] : ['repo'], { createIfNone: true });
+      controller.signal.throwIfAborted();
+      if (!session) return;
+      if (start) {
+        const projects = await fetchIssueProjects(repo, number, session.accessToken, controller.signal, fetch, vscode.l10n.t);
+        if (!projects.length) throw new Error(vscode.l10n.t("This issue does not belong to an active GitHub Project. Add it to a project first."));
+        const project = projects.length === 1 ? projects[0] : (await vscode.window.showQuickPick(
+          projects.map(project => ({ label: project.title, description: project.url, project })),
+          { title: vscode.l10n.t("Which project should be set to In progress?") }
+        ))?.project;
+        if (!project) return;
+        controller.signal.throwIfAborted();
+        await startIssueProgress(project, session.accessToken, controller.signal, fetch, vscode.l10n.t);
+        vscode.window.showInformationMessage(vscode.l10n.t("Issue #{0}: status in {1} set to In progress.", number, project.title));
+      } else {
+        await assignIssueToMe(repo, number, session.accessToken, controller.signal, fetch, vscode.l10n.t);
+        vscode.window.showInformationMessage(vscode.l10n.t("Issue #{0} is now assigned to you.", number));
+      }
+      if (selected()?.fullName === repo.fullName) await refresh();
+    } catch (error) {
+      if (!controller.signal.aborted) vscode.window.showErrorMessage(vscode.l10n.t("Could not update issue #{0}: {1}", number, error.message));
+    } finally {
+      actions.delete(item.id);
+    }
+  }
+
   function syncRepository() {
     const next = selected();
     if (next?.root !== current?.root || next?.fullName !== current?.fullName) void refresh();
@@ -148,6 +207,9 @@ async function activate(context) {
     vscode.commands.registerCommand('projectIssues.loadMore', () => refresh(true)),
     vscode.commands.registerCommand('projectIssues.signIn', () => signIn(['read:user'])),
     vscode.commands.registerCommand('projectIssues.signInPrivate', () => signIn(['repo'])),
+    vscode.commands.registerCommand('projectIssues.signInProjects', () => signIn(['repo', 'read:project'])),
+    vscode.commands.registerCommand('projectIssues.takeIssue', item => updateIssue(item, false)),
+    vscode.commands.registerCommand('projectIssues.startImplementation', item => updateIssue(item, true)),
     vscode.commands.registerCommand('projectIssues.filter', async () => {
       const choice = await vscode.window.showQuickPick(Object.entries(filters).map(([value, label]) => ({ label, value })), { title: vscode.l10n.t("Which issues should be shown?") });
       if (choice) {
@@ -167,7 +229,7 @@ async function activate(context) {
         return vscode.env.openExternal(vscode.Uri.parse(url));
       }
     }),
-    { dispose() { disposed = true; requestController?.abort(); for (const listener of watchers.values()) listener.dispose(); } }
+    { dispose() { disposed = true; requestController?.abort(); for (const controller of actions.values()) controller.abort(); for (const listener of watchers.values()) listener.dispose(); } }
   );
   await refresh();
 }

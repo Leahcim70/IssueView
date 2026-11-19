@@ -5,5 +5,7 @@
   "command.signIn": "IssueView: Bei GitHub anmelden",
   "command.filter": "IssueView: Status filtern",
   "command.selectRepository": "IssueView: Repository auswählen",
-  "command.signInPrivate": "IssueView: Zugriff auf private Repositories erlauben"
+  "command.signInPrivate": "IssueView: Zugriff auf private Repositories erlauben",
+  "command.takeIssue": "Übernehmen",
+  "command.startImplementation": "Starte Umsetzung"
 }
